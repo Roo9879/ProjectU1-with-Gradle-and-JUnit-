@@ -75,4 +75,19 @@ public class Account {
         System.out.println("Account Number: " + accountNumber);
         System.out.println("Current Balance: £" + currentBalance);
     }
+
+    public boolean transferTo(Account target, double amount) {
+        if(amount <= 0) {
+            System.out.println("Transfer amount must be positive");
+            return false;
+        }
+        if (this.makeWithdrawal(amount)) {
+            target.makeDeposit(amount);
+            System.out.println("Transferred £" + amount + " from " + this.getAccountHolderName() + " to " + target.getAccountHolderName());
+            return true;
+        } else {
+            System.out.println("Transfer failed: Insufficient funds");
+            return false;
+        }
+    }
 }

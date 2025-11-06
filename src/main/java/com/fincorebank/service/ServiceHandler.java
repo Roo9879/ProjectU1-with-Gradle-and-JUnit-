@@ -132,4 +132,32 @@ public class ServiceHandler implements AccountService {
         System.out.println("\n === Transaction History ===");
         sorted.forEach(System.out::println);
     }
+
+    @Override
+    public boolean transferFunds(String fromName, String toName, double amount) {
+        Account fromAccount = dataStore.findAccountByName(fromName);
+        Account toAccount = dataStore.findAccountByName(toName);
+
+        if (fromAccount == null || toAccount == null) {
+            System.out.println("One or both accounts not found");
+            return false;
+        }
+        if (fromAccount.equals(toAccount)) {
+            System.out.println("Cannot transfer to the same account");
+            return false;
+        }
+
+        boolean success = fromAccount.transferTo(toAccount, amount);
+
+        if(success) {
+            dataStore.updateAccount(fromAccount);
+            dataStore.updateAccount(toAccount);
+
+            Transaction transferOut = new Transaction(fromAccount.getAccountNumber(), -amount, "Transfer to " + toAccount.getAccountHolderName());
+            Transaction transferIn = new Transaction(toAccount.getAccountNumber(), amount, "Transfer from " + fromAccount.getAccountHolderName());
+            dataStore.addTransaction(fromAccount.getAccountNumber(), transferOut);
+            dataStore.addTransaction(toAccount.getAccountNumber(), transferIn);
+        }
+        return success;
+    }
 }

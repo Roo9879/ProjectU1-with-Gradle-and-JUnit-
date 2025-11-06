@@ -8,4 +8,5 @@ public interface AccountService {
     void checkBalance (Account account);
     void deleteAccount(Account account, DataStore dataStore);
     void showSortedTransactions(Account account, String sortOption);
+    boolean transferFunds(String fromName, String toName, double amount);
 }
