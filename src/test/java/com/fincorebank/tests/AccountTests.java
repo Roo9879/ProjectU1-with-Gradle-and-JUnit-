@@ -4,6 +4,8 @@ import com.fincorebank.model.*;
 import com.fincorebank.service.*;
 import org.junit.jupiter.api.*;
 import static org.junit.jupiter.api.Assertions.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class AccountTests {
     private Account account;
@@ -13,54 +15,31 @@ public class AccountTests {
         account = new Account("Vinnie", 500);
     }
 
-    @Test
-    void testDepositNegativeAmount() {
-        boolean result = account.makeDeposit(-200);
-        assertFalse(result); //checking if makeDeposit failed like it should
-        assertEquals(500, account.getCurrentBalance()); //checking that balance has stayed the same
+    @ParameterizedTest
+    @CsvSource({
+            "-200, false, 500",
+            "0, false, 500",
+            "200, true, 700"
+    })
+    @DisplayName("Tests making a deposit with a negative amount, amount of zero, and positive amount")
+    void testMakeDeposit(double amount, boolean expectedResult, double expectedBalance) {
+        boolean result = account.makeDeposit(amount);
+        assertEquals(expectedResult, result);
+        assertEquals(expectedBalance, account.getCurrentBalance());
     }
 
-    @Test
-    void testDepositZeroAmount() {
-        boolean result = account.makeDeposit(0);
-        assertFalse(result);
-        assertEquals(500, account.getCurrentBalance());
+    @ParameterizedTest
+    @CsvSource({
+            "200, true, 300",
+            "-200, false, 500",
+            "0, false, 500",
+            "600, false, 500"
+    })
+    @DisplayName("Tests making a withdrawal with a positive and negative amount, an amount of zero and an amount too high")
+    void testMakeWithdrawal(double amount, boolean expectedResult, double expectedBalance) {
+        boolean result = account.makeWithdrawal(amount);
+        assertEquals(expectedResult, result);
+        assertEquals(expectedBalance, account.getCurrentBalance());
     }
-
-    @Test
-    void testDepositPositiveAmount() {
-        boolean result = account.makeDeposit(200);
-        assertTrue(result);
-        assertEquals(700, account.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalPositiveAmount() {
-        boolean result = account.makeWithdrawal(200);
-        assertTrue(result);
-        assertEquals(300, account.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalNegativeAmount() {
-        boolean result = account.makeWithdrawal(-200);
-        assertFalse(result);
-        assertEquals(500, account.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalZeroAmount() {
-        boolean result = account.makeWithdrawal(0);
-        assertFalse(result);
-        assertEquals(500, account.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalAmountTooHigh() {
-        boolean result = account.makeWithdrawal(600);
-        assertFalse(result);
-        assertEquals(500, account.getCurrentBalance());
-    }
-
 
 }

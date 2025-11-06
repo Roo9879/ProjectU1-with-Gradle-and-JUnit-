@@ -3,6 +3,9 @@ package com.fincorebank.tests;
 import com.fincorebank.model.*;
 import com.fincorebank.service.*;
 import org.junit.jupiter.api.*;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
+
 import static org.junit.jupiter.api.Assertions.*;
 
 public class CheckingAccountTests {
@@ -13,32 +16,17 @@ public class CheckingAccountTests {
         checkingAccount = new CheckingAccount("Carol", 300, 200);
     }
 
-    @Test
-    void testWithdrawalNegativeAmount() {
-        boolean result = checkingAccount.makeWithdrawal(-200);
-        assertFalse(result);
-        assertEquals(300, checkingAccount.getCurrentBalance());
+    @ParameterizedTest
+    @CsvSource({
+            "-200, false, 300",
+            "600, false, 300",
+            "500, true, -200",
+            "400, true, -100"
+    })
+    @DisplayName("Testing making a withdrawal with a positive and negative amount, an amount exceeding the overdraft limit and meeting the limit")
+    void testMakeWithdrawal(double amount, boolean expectedResult, double expectedBalance) {
+        boolean result = checkingAccount.makeWithdrawal(amount);
+        assertEquals(expectedResult, result);
+        assertEquals(expectedBalance, checkingAccount.getCurrentBalance());
     }
-
-    @Test
-    void testWithdrawalExceedingOverdraftAmount() {
-        boolean result = checkingAccount.makeWithdrawal(600);
-        assertFalse(result);
-        assertEquals(300, checkingAccount.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalAtOverdraftAmount() {
-        boolean result = checkingAccount.makeWithdrawal(500);
-        assertTrue(result);
-        assertEquals(-200, checkingAccount.getCurrentBalance());
-    }
-
-    @Test
-    void testWithdrawalWithinBalancePlusOverdraftAmount() {
-        boolean result = checkingAccount.makeWithdrawal(400);
-        assertTrue(result);
-        assertEquals(-100, checkingAccount.getCurrentBalance());
-    }
-
 }

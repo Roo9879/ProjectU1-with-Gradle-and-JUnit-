@@ -17,11 +17,11 @@ public class DataStoreTests {
     void setUp() {
         dataStore = new InMemoryDataStore();
         account = new Account("Vinnie", 500);
+        dataStore.addAccount(account);
     }
 
     @Test
     void testAddAndFindAccountByNumber() {
-        dataStore.addAccount(account);
         Account found = dataStore.findAccountByNumber(account.getAccountNumber());
         assertNotNull(found);
         assertEquals("Vinnie", found.getAccountHolderName());
@@ -29,7 +29,6 @@ public class DataStoreTests {
 
     @Test
     void testAddAndFindAccountByName() {
-        dataStore.addAccount(account);
         Account found = dataStore.findAccountByName(account.getAccountHolderName());
         assertNotNull(found);
         assertEquals("Vinnie", found.getAccountHolderName());
@@ -37,14 +36,12 @@ public class DataStoreTests {
 
     @Test
     void testFailingFindAccountByName() {
-        dataStore.addAccount(account);
         Account found = dataStore.findAccountByName("alice");
         assertNull(found);
     }
 
     @Test
     void testAccountDeletion() {
-        dataStore.addAccount(account);
         dataStore.deleteAccount(account.getAccountNumber());
         Account notFound = dataStore.findAccountByNumber(account.getAccountNumber());
         assertNull(notFound);
@@ -52,7 +49,6 @@ public class DataStoreTests {
 
     @Test
     void testUpdateAccount() {
-        dataStore.addAccount(account);
         account.setAccountHolderName("Alice");
         account.makeDeposit(200);
         dataStore.updateAccount(account);
@@ -64,7 +60,6 @@ public class DataStoreTests {
 
     @Test
     void testAddTransaction() {
-        dataStore.addAccount(account);
         Transaction deposit = new Transaction(account.getAccountNumber(), 200, "Deposit");
         dataStore.addTransaction(account.getAccountNumber(), deposit);
 
@@ -76,7 +71,6 @@ public class DataStoreTests {
 
     @Test
     void testTransactionSorting() {
-        dataStore.addAccount(account);
         dataStore.addTransaction(account.getAccountNumber(), new Transaction(account.getAccountNumber(), 300, "Deposit"));
         dataStore.addTransaction(account.getAccountNumber(), new Transaction(account.getAccountNumber(), 100, "Withdrawal"));
         dataStore.addTransaction(account.getAccountNumber(), new Transaction(account.getAccountNumber(), 200, "Deposit"));
